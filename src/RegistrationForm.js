@@ -3,9 +3,9 @@ import './Form.css';
 import config from './config';
 
 const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
-    // const [email, setEmail] = useState('');
-    // const [password, setPassword] = useState('');
-    // const [confirmPassword, setConfirmPassword] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState({ email: "", password: "", confirmPassword: "" });
     const [userRegData, setUserRegData] = useState(
         {
