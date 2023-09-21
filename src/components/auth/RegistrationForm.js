@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import './Form.css';
-import config from './config';
+import '../../styles/Form.css';
+import config from '../../config/config';
 
 const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
     const [email, setEmail] = useState('');

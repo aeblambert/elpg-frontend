@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import './App.css';
-import RegistrationForm from './RegistrationForm';
-import LoginForm from './LoginForm';
-import Modal from './Modal';
+import './styles/App.css';
+import RegistrationForm from './components/auth/RegistrationForm';
+import LoginForm from './components/auth/LoginForm';
+import Modal from './components/ui/Modal';
 
 function App() {
     const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
