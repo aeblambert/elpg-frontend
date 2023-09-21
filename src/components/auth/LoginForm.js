@@ -2,12 +2,57 @@ import React, { useState } from 'react';
 import '../../styles/Form.css';
 const MIN_PASSWORD_LENGTH = 8;
 
+
 function LoginForm() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({ email: "", password: "" });
 
+    function isTokenValid() {
+        const token = localStorage.getItem('sessionToken');
+        const expiryTime = localStorage.getItem('sessionExpiry');
+
+        if (!token || !expiryTime) {
+            return false;
+        }
+
+        const now = new Date();
+        if (now.getTime() > expiryTime) {
+            localStorage.removeItem('sessionToken');
+            localStorage.removeItem('sessionExpiry');
+            return false;
+        }
+
+        return true;
+    }
+    const handleLogin = async () => {
+        const response = await fetch('http://localhost:8080/api/users/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email, password}),
+        });
+        if (response.ok) {
+            const data = await response.json();
+
+            if (data && data.sessionToken) {
+                if (isTokenValid()) {
+                    //const token = localStorage.getItem('sessionToken');
+                    sessionStorage.setItem('sessionToken', data.sessionToken);
+                } else {
+                    // Redirect to login or show a message to the user
+                }
+
+
+
+                window.location.href = '/dashboard';
+            }
+        } else {
+            // Handle errors (bad login, server unavailable, etc.)
+            const data = await response.json();
+            console.error('Login failed:', data.message);
+        }
+    }
     const validateForm = () => {
         let isValid = true;
         let newErrors = { email: "", password: "" };
@@ -30,7 +75,7 @@ function LoginForm() {
             onSubmit={(e) => {
                 e.preventDefault();
                 if (validateForm()) {
-                    // TODO: Proceed with the login process
+                    handleLogin();
                 }
             }}
             autoComplete="off" // Disables autocomplete for the whole form, enable only for specific inputs

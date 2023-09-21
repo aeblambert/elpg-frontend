@@ -4,11 +4,33 @@ import './styles/App.css';
 import RegistrationForm from './components/auth/RegistrationForm';
 import LoginForm from './components/auth/LoginForm';
 import Modal from './components/ui/Modal';
+import SessionManager from './services/SessionManager';
+import { useEffect } from 'react';
 
 function App() {
     const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [registrationMessage, setRegistrationMessage] = useState('');
+
+    useEffect(() => {
+        const sessionDurationInMinutes = 45;
+        SessionManager.setSessionTimeout(sessionDurationInMinutes);
+        function resetSession() {
+            if (SessionManager.isTokenValid()) {
+                SessionManager.resetSessionExpiry();
+            }
+        }
+
+        window.addEventListener('mousemove', resetSession);
+        window.addEventListener('keypress', resetSession);
+        window.addEventListener('click', resetSession);
+
+        return () => {
+            window.removeEventListener('mousemove', resetSession);
+            window.removeEventListener('keypress', resetSession);
+            window.removeEventListener('click', resetSession);
+        };
+    }, []);
 
     return (
         <div className="App">

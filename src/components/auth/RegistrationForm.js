@@ -27,6 +27,7 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
         event.preventDefault();
         // Handle form submission logic here
         if (validateForm()) {
+            console.log("Form is valid. Sending request to server.");
             fetch(`${config.apiUrl}/users/register`, {
                 method: 'POST',
                 headers: {
@@ -35,6 +36,7 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                 body: JSON.stringify(userRegData)
             })
                 .then(response => {
+                    console.log("Received response from server: ", response);
                     if (response.ok) {
                         return response.json();
                     } else {
@@ -42,11 +44,13 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                     }
                 })
                 .then(data => {
-                    console.log(data.message);
+                    console.log("Received data from server: ", data);
                     setRegistrationMessage(data.message);
                     closeModal();
                 })
-                .catch(error => console.error(error));
+                .catch(error => {
+                    console.error("An error occurred: ", error);
+                });
         }
     };
 
