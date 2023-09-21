@@ -21,11 +21,8 @@ function App() {
                     <button className="header-button" onClick={() => setIsLoginModalOpen(true)}>
                         Log in</button>
                     <button className="header-button" onClick={() => setIsRegistrationModalOpen(true)}>
-                        Register
-                    </button>
+                        Register</button>
                 </div>
-
-
             </header>
             <main className="App-main">
                 <p>{registrationMessage || "To view and share books, please log in or register a new account"}</p>

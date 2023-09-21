@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactModal from 'react-modal';
 
-// const Modal = ({ isOpen, onRequestClose, children }) => {
 const Modal = props => {    
     return (
         <ReactModal

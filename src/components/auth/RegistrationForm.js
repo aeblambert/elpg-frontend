@@ -3,9 +3,6 @@ import '../../styles/Form.css';
 import config from '../../config/config';
 
 const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState({ email: "", password: "", confirmPassword: "" });
     const [userRegData, setUserRegData] = useState(
         {
@@ -35,7 +32,7 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify(userRegData)
             })
                 .then(response => {
                     if (response.ok) {
@@ -59,20 +56,20 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
 
         // Validate email format
         const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailPattern.test(email)) {
+        if (!emailPattern.test(userRegData.email)) {
             newErrors.email = "Please enter a valid email address.";
             isValid = false;
         }
 
         // Validate password complexity (e.g., minimum 8 characters, at least one uppercase, one lowercase, and one digit)
         const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
-        if (!passwordPattern.test(password)) {
+        if (!passwordPattern.test(userRegData.password)) {
             newErrors.password = "Password must be at least 8 characters long, with at least one uppercase letter, one lowercase letter, and one digit.";
             isValid = false;
         }
 
         // Validate matching password confirmation
-        if (password !== confirmPassword) {
+        if (userRegData.password !== userRegData.confirmPassword) {
             newErrors.confirmPassword = "Passwords do not match.";
             isValid = false;
         }
@@ -90,7 +87,6 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                     id="email"
                     // value={email}
                     value={userRegData.email}
-                    // onChange={(e) => setEmail(e.target.value)}
                     onChange={(e) => handleUserRegDataChange("email", e.target.value)}
                     required
                     autoComplete="email"
@@ -103,7 +99,6 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                     type="password"
                     id="password"
                     value={userRegData.password}
-                    // onChange={(e) => setPassword(e.target.value)}
                     onChange={(e) => handleUserRegDataChange("password", e.target.value)}
                     required
                 />
@@ -115,7 +110,6 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                     type="password"
                     id="password-confirmation"
                     value={userRegData.confirmPassword}
-                    //onChange={(e) => setConfirmPassword(e.target.value)}
                     onChange={(e) => handleUserRegDataChange("confirmPassword", e.target.value)}
                     required
                 />
