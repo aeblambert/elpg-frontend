@@ -36,6 +36,10 @@ class SessionManager {
         localStorage.setItem('sessionExpiry', expiry.toString());
     }
 
+    static getSessionToken() {
+        return localStorage.getItem('sessionToken');
+    }
+
     static clearSession() {
         localStorage.removeItem('sessionToken');
         localStorage.removeItem('sessionExpiry');
