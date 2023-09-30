@@ -7,7 +7,7 @@ import LoginForm from './components/auth/LoginForm';
 import Dashboard from './components/ui/Dashboard';
 import Modal from './components/ui/Modal';
 import SessionManager from './services/SessionManager';
-import { AuthProvider, useAuth } from './components/auth/AuthContext';
+import { useAuth } from './components/auth/AuthContext';
 
 function AppRoutes() {
     const { userEmail, isLoggedIn } = useAuth();
@@ -53,7 +53,6 @@ function App() {
     console.log("User in App:", userEmail);
     console.log("isLoggedIn in App:", isLoggedIn);
     return (
-        <AuthProvider>
             <Router>
                 <div className="App">
                     <header className="App-header">
@@ -96,7 +95,6 @@ function App() {
                     </Modal>
                 </div>
             </Router>
-        </AuthProvider>
     );
 }
 
