@@ -10,9 +10,8 @@ import SessionManager from './services/SessionManager';
 import { AuthProvider, useAuth } from './components/auth/AuthContext';
 
 function AppRoutes() {
-    const { user } = useAuth();
-    const { isLoggedIn } = useAuth();
-    console.log("User in AppRoutes:", user);
+    const { userEmail, isLoggedIn } = useAuth();
+    console.log("User in AppRoutes:", userEmail);
     console.log("isLoggedIn in AppRoutes:", isLoggedIn);
     return (
         <Routes>
@@ -25,7 +24,7 @@ function App() {
     const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [registrationMessage, setRegistrationMessage] = useState('');
-    const { isLoggedIn, setIsLoggedIn } = useAuth();
+    const { isLoggedIn, setIsLoggedIn, userEmail } = useAuth();
     const handleLogout = () => {
         // Logic to clear the session or token
         setIsLoggedIn(false);
@@ -51,6 +50,8 @@ function App() {
         };
     }, []);
 
+    console.log("User in App:", userEmail);
+    console.log("isLoggedIn in App:", isLoggedIn);
     return (
         <AuthProvider>
             <Router>
@@ -62,9 +63,12 @@ function App() {
                         </div>
                         <div className="header-buttons">
                             {isLoggedIn ? (
-                                <button className="header-button" onClick={handleLogout}>
-                                    Logout
-                                </button>
+                                <>
+                                    <span>{userEmail}</span>
+                                    <button className="header-button" onClick={handleLogout}>
+                                        Logout
+                                    </button>
+                                </>
                             ) : (
                                 <>
                                     <button className="header-button" onClick={() => setIsLoginModalOpen(true)}>
