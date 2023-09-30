@@ -26,7 +26,7 @@ function LoginForm({closeModal}) {
                 setIsLoggedIn(true);
                 setUserEmail(email);
                 closeModal();
-                SessionManager.setSessionToken(data.sessionToken);
+                SessionManager.setSessionToken(data.sessionToken, email);
                 if (SessionManager.isTokenValid()) {
                     navigate('/dashboard');
                 }

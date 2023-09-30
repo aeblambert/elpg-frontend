@@ -29,11 +29,12 @@ class SessionManager {
         return true;
     }
 
-    static setSessionToken(token) {
+    static setSessionToken(token, userEmail) {
         const now = new Date().getTime();
         const expiry = now + this.sessionTimeout;
         localStorage.setItem('sessionToken', token);
         localStorage.setItem('sessionExpiry', expiry.toString());
+        localStorage.setItem('userEmail', userEmail); // Store the email
     }
 
     static getSessionToken() {

@@ -15,6 +15,7 @@ function AppRoutes() {
     console.log("isLoggedIn in AppRoutes:", isLoggedIn);
     return (
         <Routes>
+            <Route path="/" element={!isLoggedIn ?  <Navigate to="/" /> : <Navigate to="/dashboard" />} />
             <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/" />} />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
@@ -24,11 +25,10 @@ function App() {
     const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [registrationMessage, setRegistrationMessage] = useState('');
-    const { isLoggedIn, setIsLoggedIn, userEmail } = useAuth();
+    const { isLoggedIn, setIsLoggedIn, userEmail, setUserEmail } = useAuth();
     const handleLogout = () => {
-        // Logic to clear the session or token
         setIsLoggedIn(false);
-        // Optionally, clear other user data, if any
+        localStorage.removeItem('sessionToken');
     }
     useEffect(() => {
         const sessionDurationInMinutes = 45;
@@ -48,6 +48,15 @@ function App() {
             window.removeEventListener('keypress', resetSession);
             window.removeEventListener('click', resetSession);
         };
+    }, []);
+
+    useEffect(() => {
+        const storedToken = localStorage.getItem("sessionToken");
+        const storedEmail = localStorage.getItem("userEmail");
+        if (SessionManager.isTokenValid(storedToken)) {
+            setIsLoggedIn(true);
+            setUserEmail(storedEmail);
+        }
     }, []);
 
     console.log("User in App:", userEmail);
@@ -83,7 +92,9 @@ function App() {
 
                     <main className="App-main">
                         <AppRoutes />
-                        <p>{registrationMessage || "To view and share books, please log in or register a new account"}</p>
+                        <p>{!isLoggedIn && (
+                            <p>{registrationMessage || "To view and share books, please log in or register a new account"}</p>
+                        )}</p>
                     </main>
                     <Modal isOpen={isRegistrationModalOpen} onRequestClose={()=>setIsRegistrationModalOpen(false)}>
                         <h2>Register</h2>
