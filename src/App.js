@@ -26,10 +26,12 @@ function App() {
     const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [registrationMessage, setRegistrationMessage] = useState('');
-    const { isLoggedIn, setIsLoggedIn, userEmail, setUserEmail } = useAuth();
+    const { isLoggedIn, setIsLoggedIn, userEmail, setUserEmail, landingPageMessage, setLandingPageMessage } = useAuth();
     const handleLogout = () => {
         setIsLoggedIn(false);
+        setUserEmail(null);
         sessionManager.clearSession();
+        setLandingPageMessage(null);
     }
     useEffect(() => {
         const sessionDurationInMinutes = 45;
@@ -38,9 +40,14 @@ function App() {
         const resetThresholdInMinutes = 5;
         function resetSession() {
             const currentTime = new Date().getTime();
-            if (SessionManager.checkSessionValid() && currentTime - lastReset > resetThresholdInMinutes * 60 * 1000) {
-                lastReset = currentTime;
-                SessionManager.resetSessionExpiry();
+            if (SessionManager.checkSessionValid()) {
+                if (currentTime - lastReset > resetThresholdInMinutes * 60 * 1000) {
+                    lastReset = currentTime;
+                    SessionManager.resetSessionExpiry();
+                    setLandingPageMessage(null);
+                } else {
+                    setLandingPageMessage('Session has expired.  Please log in again!');
+                }
             }
         }
 
@@ -67,8 +74,6 @@ function App() {
         }
     }, []);
 
-    console.log("User in App:", userEmail);
-    console.log("isLoggedIn in App:", isLoggedIn);
     return (
             <Router>
                 <div className="App">
@@ -101,7 +106,7 @@ function App() {
                     <main className="App-main">
                         <AppRoutes />
                         {!isLoggedIn && (
-                            <p>{registrationMessage || "To view and share books, please log in or register a new account"}</p>
+                            <p>{landingPageMessage || 'To view and share books, please log in or register a new account'}</p>
                         )}
                     </main>
                     <Modal isOpen={isRegistrationModalOpen} onRequestClose={()=>setIsRegistrationModalOpen(false)}>

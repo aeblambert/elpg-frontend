@@ -5,14 +5,17 @@ export const AuthContext = createContext({
     setIsLoggedIn: () => {},
     userEmail: null,
     setUserEmail: () => {},
+    landingPageMessage: '',
+    setLandingPageMessage: () => {},
 });
 
 export function AuthProvider({ children }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userEmail, setUserEmail] = useState(null);
+    const [landingPageMessage, setLandingPageMessage] = useState(null);
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userEmail, setUserEmail }}>
+        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userEmail, setUserEmail, landingPageMessage, setLandingPageMessage }}>
             {children}
         </AuthContext.Provider>
     );
