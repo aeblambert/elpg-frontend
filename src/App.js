@@ -34,8 +34,12 @@ function App() {
     useEffect(() => {
         const sessionDurationInMinutes = 45;
         SessionManager.setSessionTimeout(sessionDurationInMinutes);
+        let lastReset = 0;
+        const resetThresholdInMinutes = 5;
         function resetSession() {
-            if (SessionManager.checkSessionValid()) {
+            const currentTime = new Date().getTime();
+            if (SessionManager.checkSessionValid() && currentTime - lastReset > resetThresholdInMinutes * 60 * 1000) {
+                lastReset = currentTime;
                 SessionManager.resetSessionExpiry();
             }
         }
