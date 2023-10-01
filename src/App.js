@@ -8,6 +8,7 @@ import Dashboard from './components/ui/Dashboard';
 import Modal from './components/ui/Modal';
 import SessionManager from './services/SessionManager';
 import { useAuth } from './components/auth/AuthContext';
+import sessionManager from "./services/SessionManager";
 
 function AppRoutes() {
     const { userEmail, isLoggedIn } = useAuth();
@@ -28,13 +29,13 @@ function App() {
     const { isLoggedIn, setIsLoggedIn, userEmail, setUserEmail } = useAuth();
     const handleLogout = () => {
         setIsLoggedIn(false);
-        localStorage.removeItem('sessionToken');
+        sessionManager.clearSession();
     }
     useEffect(() => {
         const sessionDurationInMinutes = 45;
         SessionManager.setSessionTimeout(sessionDurationInMinutes);
         function resetSession() {
-            if (SessionManager.isTokenValid()) {
+            if (SessionManager.checkSessionValid()) {
                 SessionManager.resetSessionExpiry();
             }
         }
@@ -51,11 +52,14 @@ function App() {
     }, []);
 
     useEffect(() => {
-        const storedToken = localStorage.getItem("sessionToken");
         const storedEmail = localStorage.getItem("userEmail");
-        if (SessionManager.isTokenValid(storedToken)) {
+        if (SessionManager.checkSessionValid()) {
             setIsLoggedIn(true);
             setUserEmail(storedEmail);
+        } else {
+            setIsLoggedIn(false);
+            localStorage.removeItem("userEmail");
+            SessionManager.clearSession();
         }
     }, []);
 
@@ -92,9 +96,9 @@ function App() {
 
                     <main className="App-main">
                         <AppRoutes />
-                        <p>{!isLoggedIn && (
+                        {!isLoggedIn && (
                             <p>{registrationMessage || "To view and share books, please log in or register a new account"}</p>
-                        )}</p>
+                        )}
                     </main>
                     <Modal isOpen={isRegistrationModalOpen} onRequestClose={()=>setIsRegistrationModalOpen(false)}>
                         <h2>Register</h2>

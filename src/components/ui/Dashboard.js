@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { AuthContext } from '../auth/AuthContext';
 
 function Dashboard() {
-    const {setIsLoggedIn, userEmail, setUserEmail } = useContext(AuthContext);
+    const {userEmail} = useContext(AuthContext);
 
     return (
         <div>

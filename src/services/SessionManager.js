@@ -1,5 +1,3 @@
-// services/SessionManager.js
-
 class SessionManager {
 
     static sessionTimeout = 30 * 60 * 1000; // 30 minutes is default
@@ -12,37 +10,42 @@ class SessionManager {
         localStorage.setItem('sessionExpiry', newExpiry.toString());
     }
 
-    static isTokenValid() {
-        const token = localStorage.getItem('sessionToken');
+    static checkSessionValid() {
+        const jwtToken = localStorage.getItem('jwtToken');
         const expiryTime = localStorage.getItem('sessionExpiry');
-
-        if (!token || !expiryTime) {
+        console.log("isJwtTokenValid: ", jwtToken);
+        if (!jwtToken || !expiryTime) {
+            console.log("jwtToken: ", jwtToken);
+            console.log("ExpiryTime: ", expiryTime);
+            console.log("!token || !expiryTime");
             return false;
         }
 
         const now = new Date();
         if (now.getTime() > expiryTime) {
             this.clearSession();
+            console.log("now.getTime() > expiryTime");
             return false;
         }
-
+        console.log("returning true");
         return true;
     }
 
-    static setSessionToken(token, userEmail) {
+    static setJwtSessionToken(jwtToken, userEmail) {
         const now = new Date().getTime();
         const expiry = now + this.sessionTimeout;
-        localStorage.setItem('sessionToken', token);
+        localStorage.setItem('jwtToken', jwtToken);
+        //localStorage.setItem('sessionToken', token);
         localStorage.setItem('sessionExpiry', expiry.toString());
-        localStorage.setItem('userEmail', userEmail); // Store the email
+        localStorage.setItem('userEmail', userEmail);
     }
 
-    static getSessionToken() {
-        return localStorage.getItem('sessionToken');
+    static getJwtToken() {
+        return localStorage.getItem('jwtToken');
     }
 
     static clearSession() {
-        localStorage.removeItem('sessionToken');
+        localStorage.removeItem('jwtToken');
         localStorage.removeItem('sessionExpiry');
     }
 }

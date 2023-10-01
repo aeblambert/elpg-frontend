@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import jwt_decode from 'jwt-decode'; // Import the jwt-decode library
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Form.css';
 import { useAuth } from "./AuthContext";
@@ -9,8 +10,8 @@ function LoginForm({closeModal}) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({ email: "", password: "" });
-    const { isLoggedIn, setIsLoggedIn, setUserEmail } = useAuth(); // Make sure these methods are correctly exported from useAuth.
-    const navigate = useNavigate(); // This is part of 'react-router-dom', so it should work.
+    const { isLoggedIn, setIsLoggedIn, setUserEmail } = useAuth();
+    const navigate = useNavigate();
     useEffect(() => {
         console.log("isLoggedIn changed to: ", isLoggedIn);
     }, [isLoggedIn]);
@@ -21,19 +22,31 @@ function LoginForm({closeModal}) {
             body: JSON.stringify({ email, password }),
         });
         if (response.ok) {
+            console.log("Response is ok");
             const data = await response.json();
-            if (data && data.sessionToken) {
-                setIsLoggedIn(true);
-                setUserEmail(email);
-                closeModal();
-                SessionManager.setSessionToken(data.sessionToken, email);
-                if (SessionManager.isTokenValid()) {
+            console.log("Token (in LoginForm): ", data.jwtToken);
+            if (data.jwtToken) {
+                // First validate the JWT
+                const decoded = jwt_decode(data.jwtToken);
+                console.log("Testing response: decoded: ", decoded);
+                if (decoded && decoded.email === email) {
+                    setIsLoggedIn(true);
+                    setUserEmail(email);
+                    SessionManager.setJwtSessionToken(data.jwtToken, email);
+                    closeModal();
                     navigate('/dashboard');
+                } else {
+                    console.error('Invalid JWT token');
+                    // TODO: Redirect to login or show error message
                 }
+            } else {
+                console.error('JWT token missing in response');
+                // TODO: Redirect to login or show error message
             }
         } else {
             const data = await response.json();
             console.error('Login failed:', data.message);
+            // TODO: Redirect to login or show error message
         }
     };
 
@@ -54,7 +67,6 @@ function LoginForm({closeModal}) {
         }
 
         setErrors(newErrors);
-        console.log("Form validation result:", isValid);  // Debug log
         return isValid;
     };
 
