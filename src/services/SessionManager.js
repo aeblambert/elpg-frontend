@@ -13,21 +13,15 @@ class SessionManager {
     static checkSessionValid() {
         const jwtToken = localStorage.getItem('jwtToken');
         const expiryTime = localStorage.getItem('sessionExpiry');
-        console.log("isJwtTokenValid: ", jwtToken);
         if (!jwtToken || !expiryTime) {
-            console.log("jwtToken: ", jwtToken);
-            console.log("ExpiryTime: ", expiryTime);
-            console.log("!token || !expiryTime");
             return false;
         }
 
         const now = new Date();
         if (now.getTime() > expiryTime) {
             this.clearSession();
-            console.log("now.getTime() > expiryTime");
             return false;
         }
-        console.log("returning true");
         return true;
     }
 

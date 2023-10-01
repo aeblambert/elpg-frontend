@@ -12,9 +12,9 @@ function LoginForm({closeModal}) {
     const [errors, setErrors] = useState({ email: "", password: "" });
     const { isLoggedIn, setIsLoggedIn, setUserEmail } = useAuth();
     const navigate = useNavigate();
-    useEffect(() => {
-        console.log("isLoggedIn changed to: ", isLoggedIn);
-    }, [isLoggedIn]);
+//    useEffect(() => {
+//        console.log("isLoggedIn changed to: ", isLoggedIn);
+//    }, [isLoggedIn]);
     const handleLogin = async () => {
         const response = await fetch('http://localhost:8080/api/users/login', {
             method: 'POST',
@@ -22,13 +22,10 @@ function LoginForm({closeModal}) {
             body: JSON.stringify({ email, password }),
         });
         if (response.ok) {
-            console.log("Response is ok");
             const data = await response.json();
-            console.log("Token (in LoginForm): ", data.jwtToken);
             if (data.jwtToken) {
                 // First validate the JWT
                 const decoded = jwt_decode(data.jwtToken);
-                console.log("Testing response: decoded: ", decoded);
                 if (decoded && decoded.email === email) {
                     setIsLoggedIn(true);
                     setUserEmail(email);
@@ -51,7 +48,6 @@ function LoginForm({closeModal}) {
     };
 
     const validateForm = () => {
-        console.log("validateForm called");  // Debug log
         let isValid = true;
         let newErrors = { email: "", password: "" };
         const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;

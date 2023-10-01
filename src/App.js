@@ -12,8 +12,6 @@ import sessionManager from "./services/SessionManager";
 
 function AppRoutes() {
     const { userEmail, isLoggedIn } = useAuth();
-    console.log("User in AppRoutes:", userEmail);
-    console.log("isLoggedIn in AppRoutes:", isLoggedIn);
     return (
         <Routes>
             <Route path="/" element={!isLoggedIn ?  <Navigate to="/" /> : <Navigate to="/dashboard" />} />
