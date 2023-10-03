@@ -4,14 +4,14 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import './styles/App.css';
 import RegistrationForm from './components/auth/RegistrationForm';
 import LoginForm from './components/auth/LoginForm';
+import NewUserForm from './components/auth/NewUserForm';
 import Dashboard from './components/ui/Dashboard';
 import Modal from './components/ui/Modal';
 import SessionManager from './services/SessionManager';
 import { useAuth } from './components/auth/AuthContext';
-import sessionManager from "./services/SessionManager";
 
 function AppRoutes() {
-    const { userEmail, isLoggedIn } = useAuth();
+    const { isLoggedIn } = useAuth();
     return (
         <Routes>
             <Route path="/" element={!isLoggedIn ?  <Navigate to="/" /> : <Navigate to="/dashboard" />} />
@@ -21,14 +21,16 @@ function AppRoutes() {
     );
 }
 function App() {
-    const [isRegistrationModalOpen, setIsRegistrationModalOpen] = useState(false);
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [registrationMessage, setRegistrationMessage] = useState('');
-    const { isLoggedIn, setIsLoggedIn, userEmail, setUserEmail, landingPageMessage, setLandingPageMessage } = useAuth();
+    const [activeModal, setActiveModal] = useState(null);
+    const [setRegistrationMessage] = useState('');
+    const { isLoggedIn, setIsLoggedIn, authEmail, setAuthEmail,
+        authNickname, setAuthNickname, landingPageMessage, setLandingPageMessage } = useAuth();
+   // const [cachedCredentials, setCachedCredentials] = useAuth();
     const handleLogout = () => {
         setIsLoggedIn(false);
-        setUserEmail(null);
-        sessionManager.clearSession();
+        setAuthEmail(null);
+        setAuthNickname(null);
+        SessionManager.clearSession();
         setLandingPageMessage(null);
     }
     useEffect(() => {
@@ -61,10 +63,12 @@ function App() {
     }, []);
 
     useEffect(() => {
-        const storedEmail = localStorage.getItem("userEmail");
+        const cachedEmail = localStorage.getItem("cachedEmail");
+        const cachedNickname = localStorage.getItem("cachedNickname");
         if (SessionManager.checkSessionValid()) {
             setIsLoggedIn(true);
-            setUserEmail(storedEmail);
+            setAuthEmail(cachedEmail);
+            setAuthNickname(cachedNickname);
         } else {
             setIsLoggedIn(false);
             localStorage.removeItem("userEmail");
@@ -83,17 +87,17 @@ function App() {
                         <div className="header-buttons">
                             {isLoggedIn ? (
                                 <>
-                                    <span>{userEmail}</span>
+                                    <span>{authNickname}</span>
                                     <button className="header-button" onClick={handleLogout}>
                                         Logout
                                     </button>
                                 </>
                             ) : (
                                 <>
-                                    <button className="header-button" onClick={() => setIsLoginModalOpen(true)}>
+                                    <button className="header-button" onClick={() => setActiveModal('loginForm')}>
                                         Log in
                                     </button>
-                                    <button className="header-button" onClick={() => setIsRegistrationModalOpen(true)}>
+                                    <button className="header-button" onClick={() => setActiveModal('registrationForm')}>
                                         Register
                                     </button>
                                 </>
@@ -107,13 +111,32 @@ function App() {
                             <p>{landingPageMessage || 'To view and share books, please log in or register a new account'}</p>
                         )}
                     </main>
-                    <Modal isOpen={isRegistrationModalOpen} onRequestClose={()=>setIsRegistrationModalOpen(false)}>
-                        <h2>Register</h2>
-                        <RegistrationForm closeModal={()=>setIsRegistrationModalOpen(false)} setRegistrationMessage={setRegistrationMessage}/>
-                    </Modal>
-                    <Modal isOpen={isLoginModalOpen} onRequestClose={()=>setIsLoginModalOpen(false)}>
-                        <h2>Log in</h2>
-                        <LoginForm closeModal={() => setIsLoginModalOpen(false)}/>
+
+                    <Modal
+                        isOpen={activeModal !== null}
+                        onRequestClose={() => {
+                            console.log("Current activeModal: ", activeModal);
+                            setActiveModal(null);
+                            }}
+                    >
+                        <h2>
+                            {activeModal === 'newUserForm' ? 'Choose Nickname' :
+                                activeModal === 'registrationForm' ? 'Register' : 'Log in'}
+                        </h2>
+                        {activeModal === 'loginForm' && (
+                            <LoginForm
+                            //closeModal={() => setActiveModal(null)}
+                            setActiveModal={setActiveModal}
+                            />
+                        )}
+                        {activeModal === 'registrationForm' && (
+                            <RegistrationForm closeModal={() => setActiveModal(null)} setRegistrationMessage={setRegistrationMessage}/>
+                        )}
+                        {activeModal === 'newUserForm' && (
+                            <NewUserForm
+                                setActiveModal={setActiveModal}
+                            />
+                        )}
                     </Modal>
                 </div>
             </Router>

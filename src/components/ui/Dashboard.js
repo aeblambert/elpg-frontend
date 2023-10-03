@@ -2,11 +2,11 @@ import React, { useContext } from 'react';
 import { AuthContext } from '../auth/AuthContext';
 
 function Dashboard() {
-    const {userEmail} = useContext(AuthContext);
+    const {userEmail, userNickname} = useContext(AuthContext);
 
     return (
         <div>
-            <h1>Welcome, {userEmail}</h1>
+            <h1>Welcome, {userNickname}</h1>
             <p>You're now on the dashboard!</p>
         </div>
     );

@@ -4,18 +4,31 @@ export const AuthContext = createContext({
     isLoggedIn: false,
     setIsLoggedIn: () => {},
     userEmail: null,
-    setUserEmail: () => {},
+    setAuthEmail: () => {},
+    userNickname: null,
+    setAuthNickname: () => {},
+    cachedCredentials: null,
+    setCachedCredentials: () => {},
     landingPageMessage: '',
     setLandingPageMessage: () => {},
 });
 
 export function AuthProvider({ children }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userEmail, setUserEmail] = useState(null);
+    const [authEmail, setAuthEmail] = useState(null);
+    const [authNickname, setAuthNickname] = useState(null);
+    const [cachedCredentials, setCachedCredentials] = useState({ cachedEmail: null, cachedPassword: null });
     const [landingPageMessage, setLandingPageMessage] = useState(null);
+    const authValues = {
+        isLoggedIn, setIsLoggedIn,
+        authEmail, setAuthEmail,
+        authNickname, setAuthNickname,
+        cachedCredentials, setCachedCredentials,
+        landingPageMessage, setLandingPageMessage
+    };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userEmail, setUserEmail, landingPageMessage, setLandingPageMessage }}>
+        <AuthContext.Provider value={authValues}>
             {children}
         </AuthContext.Provider>
     );

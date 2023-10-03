@@ -42,6 +42,24 @@ class SessionManager {
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('sessionExpiry');
     }
+
+    static setTemporaryJwtToken(jwtToken, email) {
+        // Store token temporarily (in sessionStorage, for example)
+        sessionStorage.setItem('tempJwtToken', jwtToken);
+        sessionStorage.setItem('tempUserEmail', email);
+    }
+    static getTemporaryJwtToken() {
+        // Retrieve the temporarily stored token
+        return {
+            jwtToken: sessionStorage.getItem('tempJwtToken'),
+            email: sessionStorage.getItem('tempUserEmail')
+        };
+    }
+    static clearTemporaryJwtToken() {
+        // Clear temporary token
+        sessionStorage.removeItem('tempJwtToken');
+        sessionStorage.removeItem('tempUserEmail');
+    }
 }
 
 export default SessionManager;
