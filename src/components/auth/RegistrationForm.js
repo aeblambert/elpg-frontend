@@ -86,7 +86,6 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                 <input
                     type="email"
                     id="email"
-                    // value={email}
                     value={userRegData.email}
                     onChange={(e) => handleUserRegDataChange("email", e.target.value)}
                     required
@@ -114,7 +113,9 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                     onChange={(e) => handleUserRegDataChange("confirmPassword", e.target.value)}
                     required
                 />
+                <div id="error-message">
                 {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+                </div>
             </div>
             <div className="button-container">
                 <button type="submit">Register</button>

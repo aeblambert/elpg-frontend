@@ -1,28 +1,31 @@
-import React, {useState, useEffect, useContext} from 'react';
+import React, {useState } from 'react';
 import jwt_decode from 'jwt-decode'; // Import the jwt-decode library
 import { useNavigate } from 'react-router-dom';
 import '../../styles/Form.css';
-import {AuthContext, useAuth} from "./AuthContext";
+import { useAuth } from "./AuthContext";
 import SessionManager from "../../services/SessionManager";
 import NewUserForm from './NewUserForm';
 const MIN_PASSWORD_LENGTH = 8;
 
 const LoginForm
       = ({setActiveModal}) =>  {
-    const [enteredEmail, setEnteredEmail] = useState(null);
-    const [enteredPassword, setEnteredPassword] = useState(null);
+    const [enteredEmail, setEnteredEmail] = useState('');
+    const [enteredPassword, setEnteredPassword] = useState('');
     const [errors, setErrors] = useState({ email: "", password: "" });
-    const { setIsLoggedIn, setAuthEmail, setAuthNickname, setCachedCredentials } = useAuth();
+    const [loginMessage, setLoginMessage] = useState('');
+    const { setIsLoggedIn, setAuthEmail, authNickname, setAuthNickname, setCachedCredentials } = useAuth();
     const navigate = useNavigate();
 
     const handleLogin = async () => {
+        console.log("Entered email: ", enteredEmail);
         const response = await fetch('http://localhost:8080/api/users/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ enteredEmail, enteredPassword }),
+            body: JSON.stringify({ email: enteredEmail, password: enteredPassword }),
         });
         if (response.ok) {
             const data = await response.json();
+            setLoginMessage(data.message);
             if (data.jwtToken) {
                 const decoded = jwt_decode(data.jwtToken);
                 if (decoded && decoded.email === enteredEmail) {
@@ -34,11 +37,13 @@ const LoginForm
                         SessionManager.setTemporaryJwtToken(data.jwtToken, enteredEmail);
                         setActiveModal('newUserForm');
                     } else {
+                        console.log("In login section");
                         setIsLoggedIn(true);
                         setAuthEmail(enteredEmail);
-                        setAuthNickname(decoded.nickname);
-                        SessionManager.setJwtSessionToken(data.jwtToken, enteredEmail);
-                        //closeModal();
+                        setAuthNickname(data.nickname);
+                        console.log("Logged in as ", data.nickname, authNickname);
+                        SessionManager.setJwtSessionToken(data.jwtToken, enteredEmail, data.nickname);
+
                         setActiveModal(null);
                         navigate('/dashboard');
                     }
@@ -48,7 +53,6 @@ const LoginForm
                 }
             } else {
                 console.error('JWT token missing in response');
-                // TODO: Redirect to login or show error message
             }
         } else {
             const data = await response.json();
@@ -110,11 +114,16 @@ const LoginForm
                     required
                     autoComplete="current-password" // Enables autocomplete for password
                 />
+                <div id="error-message">
                 {errors.password && <span className="error-message">{errors.password}</span>}
+                </div>
             </div>
             <div className="button-container">
                 <button type="submit">Log in</button>
             </div>
+                <div id="error-message">
+                    {loginMessage && <p>{loginMessage}</p>}
+                </div>
         </form>
             }
         </>

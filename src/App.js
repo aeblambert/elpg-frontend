@@ -14,7 +14,7 @@ function AppRoutes() {
     const { isLoggedIn } = useAuth();
     return (
         <Routes>
-            <Route path="/" element={!isLoggedIn ?  <Navigate to="/" /> : <Navigate to="/dashboard" />} />
+            <Route path="/" element={isLoggedIn ? <Dashboard /> : <Navigate to="/" />} />
             <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/" />} />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
@@ -22,33 +22,53 @@ function AppRoutes() {
 }
 function App() {
     const [activeModal, setActiveModal] = useState(null);
-    const [setRegistrationMessage] = useState('');
+    const [registrationMessage, setRegistrationMessage] = useState('');
+    const [landingPageState, setLandingPageState] = useState('');
     const { isLoggedIn, setIsLoggedIn, authEmail, setAuthEmail,
-        authNickname, setAuthNickname, landingPageMessage, setLandingPageMessage } = useAuth();
+        authNickname, setAuthNickname } = useAuth();
    // const [cachedCredentials, setCachedCredentials] = useAuth();
     const handleLogout = () => {
         setIsLoggedIn(false);
         setAuthEmail(null);
         setAuthNickname(null);
-        SessionManager.clearSession();
-        setLandingPageMessage(null);
+        SessionManager.handleManualLogout();
+        setLandingPageState(SessionManager.getLandingPageState());
+        console.log("Manually logging out. landingPageState: ", landingPageState, SessionManager.getLandingPageState())
     }
+
     useEffect(() => {
-        const sessionDurationInMinutes = 45;
+        setLandingPageState(SessionManager.getLandingPageState());
+        if (landingPageState === 'sessionExpired') {
+            console.log("Session expired: ", landingPageState, SessionManager.getLandingPageState())
+            setTimeout(() => {
+                SessionManager.resetLandingPageState();
+                console.log("Timed out: ", landingPageState, SessionManager.getLandingPageState())
+            }, 5000); // 5 seconds
+        } else {
+            SessionManager.resetLandingPageState();
+            setLandingPageState(SessionManager.getLandingPageState());
+            console.log("Starting up. landingPageState: ", landingPageState, SessionManager.getLandingPageState())
+        }
+    }, []);
+
+    useEffect(() => {
+        console.log("New value of landingPageState", landingPageState, SessionManager.getLandingPageState());
+    }, [landingPageState]);
+
+    useEffect(() => {
+        const sessionDurationInMinutes = 30;
         SessionManager.setSessionTimeout(sessionDurationInMinutes);
         let lastReset = 0;
         const resetThresholdInMinutes = 5;
+
         function resetSession() {
             const currentTime = new Date().getTime();
             if (SessionManager.checkSessionValid()) {
                 if (currentTime - lastReset > resetThresholdInMinutes * 60 * 1000) {
                     lastReset = currentTime;
                     SessionManager.resetSessionExpiry();
-                    setLandingPageMessage(null);
-                } else {
-                    setLandingPageMessage('Session has expired.  Please log in again!');
                 }
-            }
+                }
         }
 
         window.addEventListener('mousemove', resetSession);
@@ -73,6 +93,7 @@ function App() {
             setIsLoggedIn(false);
             localStorage.removeItem("userEmail");
             SessionManager.clearSession();
+            //SessionManager.handleSessionExpiry();
         }
     }, []);
 
@@ -108,7 +129,11 @@ function App() {
                     <main className="App-main">
                         <AppRoutes />
                         {!isLoggedIn && (
-                            <p>{landingPageMessage || 'To view and share books, please log in or register a new account'}</p>
+                            <p>
+                                {landingPageState === 'initialRender' && 'To view and share books, please log in or register a new account'}
+                                {landingPageState === 'sessionExpired' && 'Your session has expired. Please log in again!'}
+                                {landingPageState === 'manualLogout' && 'You have logged out.  Log in again to share books!'}
+                            </p>
                         )}
                     </main>
 
@@ -144,6 +169,3 @@ function App() {
 }
 
 export default App;
-
-
-

@@ -1,6 +1,6 @@
-import React, { useState, useContext} from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext, useAuth } from './AuthContext';
+import { useAuth } from './AuthContext';
 import SessionManager from "../../services/SessionManager";
 import '../../styles/Form.css';
 const NewUserForm = ({setActiveModal}) => {

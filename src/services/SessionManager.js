@@ -25,13 +25,13 @@ class SessionManager {
         return true;
     }
 
-    static setJwtSessionToken(jwtToken, userEmail) {
+    static setJwtSessionToken(jwtToken, authEmail, authNickname) {
         const now = new Date().getTime();
         const expiry = now + this.sessionTimeout;
         localStorage.setItem('jwtToken', jwtToken);
-        //localStorage.setItem('sessionToken', token);
         localStorage.setItem('sessionExpiry', expiry.toString());
-        localStorage.setItem('userEmail', userEmail);
+        localStorage.setItem('authEmail', authEmail);
+        localStorage.setItem('authNickname', authNickname);
     }
 
     static getJwtToken() {
@@ -41,6 +41,29 @@ class SessionManager {
     static clearSession() {
         localStorage.removeItem('jwtToken');
         localStorage.removeItem('sessionExpiry');
+        localStorage.removeItem('authEmail');
+        localStorage.removeItem('authNickname');
+    }
+
+    static setLandingPageState(state) {
+        localStorage.setItem('landingPageState', state);
+    }
+
+    static getLandingPageState() {
+        return localStorage.getItem('landingPageState') || 'initialRender';
+    }
+
+    static handleSessionExpiry() {
+        this.setLandingPageState('sessionExpired');
+        this.clearSession();
+    }
+
+    static handleManualLogout() {
+        this.setLandingPageState('manualLogout');
+        this.clearSession();
+    }
+    static resetLandingPageState() {
+        this.setLandingPageState('initialRender');
     }
 
     static setTemporaryJwtToken(jwtToken, email) {
