@@ -44,10 +44,10 @@ function App() {
 
     // Timeout for session expiry
     useEffect(() => {
-        const sessionDurationInMinutes = 30;
+        const sessionDurationInMinutes = 2;
         SessionManager.setSessionTimeout(sessionDurationInMinutes);
         let lastReset = new Date().getTime();
-        const resetThresholdInMinutes = 5;
+        const resetThresholdInMinutes = 1;
         function resetSession() {
             const currentTime = new Date().getTime();
             if (SessionManager.checkSessionExists()) {
@@ -130,7 +130,9 @@ function App() {
                             />
                         )}
                         {activeModal === 'registrationForm' && (
-                            <RegistrationForm closeModal={setActiveModal}/>
+                            <RegistrationForm
+                                setActiveModal={setActiveModal}
+                            />
                         )}
                         {activeModal === 'newUserForm' && (
                             <NewUserForm

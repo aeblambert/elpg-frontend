@@ -15,7 +15,8 @@ export function AuthProvider({ children }) {
     const [authEmail, setAuthEmail] = useState(null);
     const [authNickname, setAuthNickname] = useState(null);
     const [cachedEmail, setCachedEmail] = useState(null);
-    const [lastLoginAction, setLastLoginAction] = useState(SessionManager.getLastLoginAction() === 'manualLogout' ? 'notLoggedIn' : SessionManager.getLastLoginAction());
+    const [lastLoginAction, setLastLoginAction]
+        = useState(SessionManager.getLastLoginAction() === 'manualLogout' || SessionManager.getLastLoginAction() === 'justRegistered' ? 'notLoggedIn' : SessionManager.getLastLoginAction());
     const authValues = {
         authEmail, setAuthEmail,
         authNickname, setAuthNickname,

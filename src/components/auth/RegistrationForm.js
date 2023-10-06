@@ -3,7 +3,7 @@ import '../../styles/Form.css';
 import config from '../../config/config';
 import { useAuth } from "./AuthContext";
 
-const RegistrationForm = ({closeModal }) => {
+const RegistrationForm = ({setActiveModal }) => {
     const { setLastLoginAction } = useAuth();
     const [errors, setErrors] = useState({ email: "", password: "", confirmPassword: "" });
     const [userRegData, setUserRegData] = useState(
@@ -45,7 +45,7 @@ const RegistrationForm = ({closeModal }) => {
                 })
                 .then(data => {
                     setLastLoginAction('justRegistered');
-                    closeModal();
+                    setActiveModal(null);
                 })
                 .catch(error => {
                     console.error("An error occurred: ", error);
