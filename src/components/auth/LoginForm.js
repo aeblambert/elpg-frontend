@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/Form.css';
 import { useAuth } from "./AuthContext";
 import SessionManager from "../../services/SessionManager";
-import NewUserForm from './NewUserForm';
 const MIN_PASSWORD_LENGTH = 8;
 
 const LoginForm
@@ -12,12 +11,11 @@ const LoginForm
     const [enteredEmail, setEnteredEmail] = useState('');
     const [enteredPassword, setEnteredPassword] = useState('');
     const [errors, setErrors] = useState({ email: "", password: "" });
-    const [loginMessage, setLoginMessage] = useState('');
-    const { setIsLoggedIn, setAuthEmail, authNickname, setAuthNickname, setCachedCredentials } = useAuth();
+    const [loginErrorMessage, setLoginErrorMessage] = useState('');
     const navigate = useNavigate();
+    const { setLastLoginAction, setAuthEmail, setAuthNickname, setCachedEmail} = useAuth();
 
     const handleLogin = async () => {
-        console.log("Entered email: ", enteredEmail);
         const response = await fetch('http://localhost:8080/api/users/login', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -25,25 +23,19 @@ const LoginForm
         });
         if (response.ok) {
             const data = await response.json();
-            setLoginMessage(data.message);
+            setLoginErrorMessage(data.message);
             if (data.jwtToken) {
                 const decoded = jwt_decode(data.jwtToken);
                 if (decoded && decoded.email === enteredEmail) {
-                    console.log("is first login: ", data.isFirstLogin);
                     if (data.isFirstLogin === "true") {
-                        console.log("Is First Login: ", data.isFirstLogin);
-                        console.log("Setting activeModal to newUserForm");
-                        setCachedCredentials({ enteredEmail, enteredPassword });
-                        SessionManager.setTemporaryJwtToken(data.jwtToken, enteredEmail);
+                        setCachedEmail(enteredEmail);
+                        SessionManager.setTemporaryJwtToken(data.jwtToken);
                         setActiveModal('newUserForm');
                     } else {
-                        console.log("In login section");
-                        setIsLoggedIn(true);
+                        setLastLoginAction('loggedIn');
+                        SessionManager.setJwtSessionToken(data.jwtToken, data.nickname);
                         setAuthEmail(enteredEmail);
                         setAuthNickname(data.nickname);
-                        console.log("Logged in as ", data.nickname, authNickname);
-                        SessionManager.setJwtSessionToken(data.jwtToken, enteredEmail, data.nickname);
-
                         setActiveModal(null);
                         navigate('/dashboard');
                     }
@@ -67,12 +59,12 @@ const LoginForm
         const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
 
         if (!emailRegex.test(enteredEmail)) {
-            newErrors.email = 'Please enter a valid email address.';
+            newErrors.email = 'Not a valid email';
             isValid = false;
         }
 
         if (enteredPassword.length < MIN_PASSWORD_LENGTH) {
-            newErrors.password = 'Password must be at least 8 characters long.';
+            newErrors.password = 'Min password length is 8';
             isValid = false;
         }
 
@@ -114,15 +106,19 @@ const LoginForm
                     required
                     autoComplete="current-password" // Enables autocomplete for password
                 />
-                <div id="error-message">
-                {errors.password && <span className="error-message">{errors.password}</span>}
+                <div className="error-message">
+                    {errors.password ? (
+                        <span>{errors.password}</span>
+                    ) : (
+                        loginErrorMessage && <span>{loginErrorMessage}</span>
+                    )}
                 </div>
             </div>
             <div className="button-container">
                 <button type="submit">Log in</button>
             </div>
-                <div id="error-message">
-                    {loginMessage && <p>{loginMessage}</p>}
+                <div className="error-message">
+
                 </div>
         </form>
             }

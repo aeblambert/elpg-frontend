@@ -1,27 +1,35 @@
-import React, { createContext, useState, useContext } from 'react';
-
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import SessionManager from '../../services/SessionManager';
 export const AuthContext = createContext({
-    isLoggedIn: false,
-    setIsLoggedIn: () => {},
     authEmail: null,
     setAuthEmail: () => {},
     authNickname: null,
     setAuthNickname: () => {},
-    cachedCredentials: null,
-    setCachedCredentials: () => {},
+    cachedEmail: null,
+    setCachedEmail: () => {},
+    lastLoginAction: '',
+    setLastLoginAction: () => {},
 });
 
 export function AuthProvider({ children }) {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [authEmail, setAuthEmail] = useState(null);
     const [authNickname, setAuthNickname] = useState(null);
-    const [cachedCredentials, setCachedCredentials] = useState({ cachedEmail: null, cachedPassword: null });
+    const [cachedEmail, setCachedEmail] = useState(null);
+    const [lastLoginAction, setLastLoginAction] = useState(SessionManager.getLastLoginAction() === 'manualLogout' ? 'notLoggedIn' : SessionManager.getLastLoginAction());
     const authValues = {
-        isLoggedIn, setIsLoggedIn,
         authEmail, setAuthEmail,
         authNickname, setAuthNickname,
-        cachedCredentials, setCachedCredentials,
+        cachedEmail, setCachedEmail,
+        lastLoginAction, setLastLoginAction,
     };
+    useEffect(() => {
+        const tokenData = SessionManager.getEmailAndNicknameFromToken();
+        if (tokenData) {
+            const authEmail = tokenData.email;
+            setAuthEmail(authEmail);
+            setAuthNickname((SessionManager.getAuthNickname()));
+        }
+    }, []);
 
     return (
         <AuthContext.Provider value={authValues}>

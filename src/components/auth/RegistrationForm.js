@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import '../../styles/Form.css';
 import config from '../../config/config';
+import { useAuth } from "./AuthContext";
 
-const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
+const RegistrationForm = ({closeModal }) => {
+    const { setLastLoginAction } = useAuth();
     const [errors, setErrors] = useState({ email: "", password: "", confirmPassword: "" });
     const [userRegData, setUserRegData] = useState(
         {
@@ -42,7 +44,7 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                     }
                 })
                 .then(data => {
-                    setRegistrationMessage(data.message);
+                    setLastLoginAction('justRegistered');
                     closeModal();
                 })
                 .catch(error => {
@@ -113,8 +115,8 @@ const RegistrationForm = ({closeModal, setRegistrationMessage}) => {
                     onChange={(e) => handleUserRegDataChange("confirmPassword", e.target.value)}
                     required
                 />
-                <div id="error-message">
-                {errors.confirmPassword && <span className="error-message">{errors.confirmPassword}</span>}
+                <div className="error-message">
+                {errors.confirmPassword && <span>{errors.confirmPassword}</span>}
                 </div>
             </div>
             <div className="button-container">

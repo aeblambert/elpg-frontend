@@ -4,6 +4,24 @@
     margin-bottom: 1rem;
 }
 
+.input-container-chooser {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 30px;
+}
+
+.input-label {
+    display: inline-block;
+    width: 100px;  /* Adjust as needed */
+    text-align: right;
+}
+
+input[type="text"] {
+    display: inline-block;
+    /* Other styling as required */
+}
+
 .button-container {
     display: flex;
     justify-content: center;
@@ -19,8 +37,19 @@
     cursor: pointer;
 }
 
-#error-message {
+.error-message {
+    height: 22px;  /* Or whatever height your error messages will roughly be */
+    margin-top: 10px;
+    margin-bottom: 10px;
     color: red;
-    font-size: 0.8rem;
-    margin-top: 0.25rem;
+    text-align: center;
+    font-size: 14px;
+}
+
+.intro-text {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    padding: 10px;
+    text-align: justify;
 }

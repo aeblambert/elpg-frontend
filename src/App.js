@@ -10,65 +10,56 @@ import Modal from './components/ui/Modal';
 import SessionManager from './services/SessionManager';
 import { useAuth } from './components/auth/AuthContext';
 
+
 function AppRoutes() {
-    const { isLoggedIn } = useAuth();
+    const { lastLoginAction } = useAuth();
     return (
         <Routes>
-            <Route path="/" element={isLoggedIn ? <Dashboard /> : <Navigate to="/" />} />
-            <Route path="/dashboard" element={isLoggedIn ? <Dashboard /> : <Navigate to="/" />} />
+            <Route path="/" element={lastLoginAction === 'loggedIn' ? <Dashboard /> : <Navigate to="/" />} />
+            <Route path="/dashboard" element={lastLoginAction === 'loggedIn' ? <Dashboard /> : <Navigate to="/" />} />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
 }
 function App() {
     const [activeModal, setActiveModal] = useState(null);
-    const [registrationMessage, setRegistrationMessage] = useState('');
-    const [landingPageState, setLandingPageState] = useState('');
-    const { isLoggedIn, setIsLoggedIn, authEmail, setAuthEmail,
-        authNickname, setAuthNickname } = useAuth();
-   // const [cachedCredentials, setCachedCredentials] = useAuth();
+    const { lastLoginAction, setLastLoginAction,
+            authNickname} = useAuth();
     const handleLogout = () => {
-        setIsLoggedIn(false);
-        setAuthEmail(null);
-        setAuthNickname(null);
-        SessionManager.handleManualLogout();
-        setLandingPageState(SessionManager.getLandingPageState());
-        console.log("Manually logging out. landingPageState: ", landingPageState, SessionManager.getLandingPageState())
+        setLastLoginAction('manualLogout');
+        SessionManager.clearSession();
     }
 
+    const handleSessionExpiry = () => {
+        setLastLoginAction('sessionExpired');
+        SessionManager.clearSession();
+    }
+
+    // Sync login state to local storage
     useEffect(() => {
-        setLandingPageState(SessionManager.getLandingPageState());
-        if (landingPageState === 'sessionExpired') {
-            console.log("Session expired: ", landingPageState, SessionManager.getLandingPageState())
-            setTimeout(() => {
-                SessionManager.resetLandingPageState();
-                console.log("Timed out: ", landingPageState, SessionManager.getLandingPageState())
-            }, 5000); // 5 seconds
-        } else {
-            SessionManager.resetLandingPageState();
-            setLandingPageState(SessionManager.getLandingPageState());
-            console.log("Starting up. landingPageState: ", landingPageState, SessionManager.getLandingPageState())
+        if (lastLoginAction) {
+            SessionManager.setLastLoginAction(lastLoginAction);
         }
-    }, []);
+    }, [lastLoginAction]);
 
-    useEffect(() => {
-        console.log("New value of landingPageState", landingPageState, SessionManager.getLandingPageState());
-    }, [landingPageState]);
-
+    // Timeout for session expiry
     useEffect(() => {
         const sessionDurationInMinutes = 30;
         SessionManager.setSessionTimeout(sessionDurationInMinutes);
-        let lastReset = 0;
+        let lastReset = new Date().getTime();
         const resetThresholdInMinutes = 5;
-
         function resetSession() {
             const currentTime = new Date().getTime();
-            if (SessionManager.checkSessionValid()) {
+            if (SessionManager.checkSessionExists()) {
                 if (currentTime - lastReset > resetThresholdInMinutes * 60 * 1000) {
-                    lastReset = currentTime;
-                    SessionManager.resetSessionExpiry();
+                    if (SessionManager.checkSessionExpired()) {
+                        handleSessionExpiry();
+                    } else {
+                        lastReset = currentTime;
+                        SessionManager.resetSessionExpiry();
+                    }
                 }
-                }
+            }
         }
 
         window.addEventListener('mousemove', resetSession);
@@ -80,22 +71,7 @@ function App() {
             window.removeEventListener('keypress', resetSession);
             window.removeEventListener('click', resetSession);
         };
-    }, []);
-
-    useEffect(() => {
-        const cachedEmail = localStorage.getItem("cachedEmail");
-        const cachedNickname = localStorage.getItem("cachedNickname");
-        if (SessionManager.checkSessionValid()) {
-            setIsLoggedIn(true);
-            setAuthEmail(cachedEmail);
-            setAuthNickname(cachedNickname);
-        } else {
-            setIsLoggedIn(false);
-            localStorage.removeItem("userEmail");
-            SessionManager.clearSession();
-            //SessionManager.handleSessionExpiry();
-        }
-    }, []);
+    }, );
 
     return (
             <Router>
@@ -106,10 +82,10 @@ function App() {
                             <h1 className="h1-style"> Vienna Kids Bookshare</h1>
                         </div>
                         <div className="header-buttons">
-                            {isLoggedIn ? (
+                            {lastLoginAction === 'loggedIn' ? (
                                 <>
-                                    <span>{authNickname}</span>
-                                    <button className="header-button" onClick={handleLogout}>
+                                    <span className="nickname-label">{authNickname}</span>
+                                    <button className="header-button" onClick={() => handleLogout()}>
                                         Logout
                                     </button>
                                 </>
@@ -128,34 +104,33 @@ function App() {
 
                     <main className="App-main">
                         <AppRoutes />
-                        {!isLoggedIn && (
+                        {
                             <p>
-                                {landingPageState === 'initialRender' && 'To view and share books, please log in or register a new account'}
-                                {landingPageState === 'sessionExpired' && 'Your session has expired. Please log in again!'}
-                                {landingPageState === 'manualLogout' && 'You have logged out.  Log in again to share books!'}
+                                { lastLoginAction === 'notLoggedIn' && 'To view and share books, please log in or register a new account'}
+                                { lastLoginAction === 'sessionExpired'  && 'Your session has expired. Please log in again!'}
+                                { lastLoginAction === 'manualLogout' && 'You have logged out.  Log in again to share books!'}
+                                { lastLoginAction === 'justRegistered' && 'You have successfully registered.  Please log in!' }
                             </p>
-                        )}
+                        }
                     </main>
 
                     <Modal
                         isOpen={activeModal !== null}
                         onRequestClose={() => {
-                            console.log("Current activeModal: ", activeModal);
                             setActiveModal(null);
                             }}
                     >
-                        <h2>
+                        <h2 className="modal-title">
                             {activeModal === 'newUserForm' ? 'Choose Nickname' :
                                 activeModal === 'registrationForm' ? 'Register' : 'Log in'}
                         </h2>
                         {activeModal === 'loginForm' && (
                             <LoginForm
-                            //closeModal={() => setActiveModal(null)}
                             setActiveModal={setActiveModal}
                             />
                         )}
                         {activeModal === 'registrationForm' && (
-                            <RegistrationForm closeModal={() => setActiveModal(null)} setRegistrationMessage={setRegistrationMessage}/>
+                            <RegistrationForm closeModal={setActiveModal}/>
                         )}
                         {activeModal === 'newUserForm' && (
                             <NewUserForm

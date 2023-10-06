@@ -1,12 +1,10 @@
-import React, { useContext } from 'react';
-import {AuthContext, useAuth} from '../auth/AuthContext';
+import { useAuth } from '../../components/auth/AuthContext';
 
 function Dashboard() {
-    const {userEmail, userNickname} = useAuth();
-
+    const { authNickname} = useAuth();
     return (
         <div>
-            <h1>Welcome, {userNickname}</h1>
+            <h1>Welcome, { authNickname }</h1>
             <p>You're now on the dashboard!</p>
         </div>
     );

@@ -48,7 +48,7 @@ button {
 
 .book-image-style {
   width: 286px;
-  height: 190px;
+  height: 100px;
   padding: 40px;
 }
 
@@ -73,6 +73,25 @@ button {
 
 .header-button:hover {
   background-color: #0056b3;
+}
+
+.nickname-label {
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: transparent;
+  margin-right: 10px;
+  text-align: center; /* Horizontally centre the text */
+
+  display: flex;  /* Enable flexbox */
+  align-items: center;  /* Vertical alignment */
+  justify-content: center;  /* Horizontal alignment */
+}
+
+/* To adjust when hovering over the button to keep it interactive, optional */
+.nickname-label:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* You can tweak the alpha value */
 }
 
 .custom-modal-overlay {
@@ -100,4 +119,11 @@ button {
   justify-content: center;
   align-items: center;
   position: relative;
+}
+
+.modal-title {
+  font-size: 32px;  /* Set the font size to 32px */
+  font-weight: bold;  /* Make the text bold */
+  margin-bottom: 20px;  /* Add some margin at the bottom for spacing */
+  text-align: center;  /* Center align the text */
 }
