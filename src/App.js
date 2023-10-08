@@ -121,7 +121,7 @@ function App() {
                             }}
                     >
                         <h2 className="modal-title">
-                            {activeModal === 'newUserForm' ? 'Choose Nickname' :
+                            {activeModal === 'newUserForm' ? 'Complete Registration' :
                                 activeModal === 'registrationForm' ? 'Register' : 'Log in'}
                         </h2>
                         {activeModal === 'loginForm' && (

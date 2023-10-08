@@ -29,12 +29,16 @@ const RegistrationForm = ({setActiveModal }) => {
         event.preventDefault();
         // Handle form submission logic here
         if (validateForm()) {
+            const payload = {
+                email: userRegData.email,
+                password: userRegData.password
+            };
             fetch(`${config.apiUrl}/users/register`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(userRegData)
+                body: JSON.stringify(payload)
             })
                 .then(response => {
                     if (response.ok) {

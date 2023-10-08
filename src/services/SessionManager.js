@@ -34,6 +34,7 @@ class SessionManager {
     static setJwtSessionToken(jwtToken, authNickname) {
         const now = new Date().getTime();
         const expiry = now + this.sessionTimeout;
+        console.log("jwtToken: ", jwtToken);
         localStorage.setItem('jwtToken', jwtToken);
         localStorage.setItem('sessionExpiry', expiry.toString());
         localStorage.setItem('authNickname', authNickname);
@@ -49,17 +50,35 @@ class SessionManager {
 
     static getEmailAndNicknameFromToken() {
         const jwtToken = localStorage.getItem('jwtToken');
-
+        console.log("jwtToken: ", jwtToken);
         if (jwtToken) {
             const parts = jwtToken.split('.');
+            if (parts.length !== 3) {
+                throw new Error('Invalid JWT token format');
+            }
             const payload = parts[1];
+            if (!this.isValidBase64Url(payload)) {
+              throw new Error('Invalid Base64 payload');
+            }
             const decodedPayload = atob(payload);
-            const payloadData = JSON.parse(decodedPayload);
-            const email = payloadData.email;
-            const nickname = payloadData.nickname;
-            return { email, nickname };
+            const payloadObject = JSON.parse(decodedPayload);
+            const {email, nickname} = payloadObject;
+            return {email, nickname};
         } else {
             return null;
+        }
+    }
+
+    static isValidBase64Url(str) {
+        try {
+            str = str.replace(/-/g, '+').replace(/_/g, '/');
+            while (str.length % 4) {
+                str += '=';
+            }
+            const decoded = atob(str);
+            return btoa(decoded) === str;
+        } catch (e) {
+            return false;
         }
     }
 
