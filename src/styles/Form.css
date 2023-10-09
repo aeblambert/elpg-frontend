@@ -1,7 +1,8 @@
 .input-container {
     display: flex;
     flex-direction: column;
-    margin-bottom: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
 }
 
 .input-container-chooser {
@@ -13,18 +14,19 @@
 
 .input-label {
     display: inline-block;
-    width: 100px;  /* Adjust as needed */
+    width: 100px;
     text-align: right;
 }
 
 input[type="text"] {
+    margin: 5px;
     display: inline-block;
-    /* Other styling as required */
 }
 
 .button-container {
     display: flex;
     justify-content: center;
+    margin-top: 2rem;
 }
 
 .button-container button {
@@ -38,7 +40,7 @@ input[type="text"] {
 }
 
 .error-message {
-    height: 22px;  /* Or whatever height your error messages will roughly be */
+    min-height: 22px;
     margin-top: 10px;
     margin-bottom: 10px;
     color: red;
@@ -49,7 +51,72 @@ input[type="text"] {
 .intro-text {
     font-size: 16px;
     line-height: 1.5;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     padding: 10px;
     text-align: justify;
 }
+
+.nickname-container {
+    margin-bottom: 0em;  /* You can adjust this */
+}
+
+.district-container {
+    margin-top: 0em;
+}
+
+.consent-container {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.consent-checkbox {
+    margin-right: 10px;
+}
+
+.consent-label {
+    max-width: 80%;
+    word-wrap: break-word;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.input-container-chooser input[type="checkbox"] {
+    vertical-align: middle;
+    margin-right: 15px;
+}
+
+.input-container-chooser label {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;  /* This will vertically align the checkbox and the label */
+}
+
+input[type="checkbox"] {
+    margin-right: 15px;  /* Adjust the value as needed */
+}
+
+.information-text {
+    font-weight: 600;
+    margin-bottom: 0.5rem;  /* Less space than prompts to keep it tight */
+}
+
+.prompt-text {
+    color: #333;  /* Darker grey */
+    font-weight: 600;
+    margin-bottom: 1rem;  /* Standard space */
+}
+
+.info-message {
+    min-height: 22px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: blue;
+    text-align: center;
+    font-size: 14px;
+ }

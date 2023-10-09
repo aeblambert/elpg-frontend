@@ -1,0 +1,66 @@
+.input-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.input-container-chooser {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 30px;
+}
+
+.input-label {
+    display: inline-block;
+    width: 100px;  /* Adjust as needed */
+    text-align: right;
+}
+
+input[type="text"] {
+    display: inline-block;
+    /* Other styling as required */
+}
+
+.button-container {
+    display: flex;
+    justify-content: center;
+}
+
+.button-container button {
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.button-container button:hover {
+    background-color: #13B33B;
+    color: white;
+    cursor: pointer;
+}
+
+.error-message {
+    height: 22px;  /* Or whatever height your error messages will roughly be */
+    margin-top: 10px;
+    margin-bottom: 10px;
+    color: red;
+    text-align: center;
+    font-size: 14px;
+}
+
+.intro-text {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    padding: 10px;
+    text-align: justify;
+}
+.information-text {
+    color: #777;  /* Light grey */
+    font-weight: 400;
+    margin-bottom: 0.5rem;  /* Less space than prompts to keep it tight */
+}
+
+.prompt-text {
+    color: #333;  /* Darker grey */
+    font-weight: 600;
+    margin-bottom: 1rem;  /* Standard space */
+}

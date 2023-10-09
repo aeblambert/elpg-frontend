@@ -34,7 +34,6 @@ class SessionManager {
     static setJwtSessionToken(jwtToken, authNickname) {
         const now = new Date().getTime();
         const expiry = now + this.sessionTimeout;
-        console.log("jwtToken: ", jwtToken);
         localStorage.setItem('jwtToken', jwtToken);
         localStorage.setItem('sessionExpiry', expiry.toString());
         localStorage.setItem('authNickname', authNickname);
@@ -50,7 +49,6 @@ class SessionManager {
 
     static getEmailAndNicknameFromToken() {
         const jwtToken = localStorage.getItem('jwtToken');
-        console.log("jwtToken: ", jwtToken);
         if (jwtToken) {
             const parts = jwtToken.split('.');
             if (parts.length !== 3) {

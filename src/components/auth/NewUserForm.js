@@ -10,6 +10,7 @@ const NewUserForm = ({setActiveModal}) => {
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [hasConsented, setHasConsented] = useState(false);
     const { setLastLoginAction, setAuthEmail, setAuthNickname, cachedEmail} = useAuth();
+    const minLengthNicknameErrorMessage = "Please use 5-10 letters or numbers"
     const handleSubmit = async (e) => {
         e.preventDefault();
         setNicknameError('');
@@ -24,6 +25,7 @@ const NewUserForm = ({setActiveModal}) => {
                     consent: hasConsented
                 }),
             });
+            const data = await response.json();
             if (response.ok) {
                 setLastLoginAction('loggedIn');
                 SessionManager.setJwtSessionToken(SessionManager.getTemporaryJwtToken(), enteredNickname);
@@ -32,9 +34,9 @@ const NewUserForm = ({setActiveModal}) => {
                 setAuthNickname(enteredNickname);
                 setActiveModal(null);
                 navigate('/dashboard');
-        } else {
-                const data = await response.json();
+            } else if (response.status === 409) {
                 setNicknameError(data.message);
+                return;
             }
         } catch (error) {
             console.error('An error occurred:', error);
@@ -43,26 +45,40 @@ const NewUserForm = ({setActiveModal}) => {
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="intro-text">
-                <p>As a new user, you need to provide additional information to access the booksharing service</p>
+            <div className="intro-text information-text">
+                As a new user, you need to provide additional information to access the booksharing service.
             </div>
-            <div className="input-container-chooser">
-                Enter a nickname you will be known by:
-                <label htmlFor="username" className="input-label">&nbsp;</label>
+            <div className="input-container-chooser nickname-container">
+                Enter a nickname you would like to be known by:
+                <label htmlFor="nickname" className="input-label"></label>
             <input
-                id="username"
-                type="text"
+                id="nickname"
+                type="text" autocomplete="off"
+                minLength="5"
                 value={enteredNickname}
-                onChange={(e) => setEnteredNickname(e.target.value)}
+                onChange={(e) => {
+                    const input = e.target.value.toLowerCase();
+                    const lowercaseAndDigitsOnly = input.replace(/[^a-z0-9]/g, '');
+                    setEnteredNickname(lowercaseAndDigitsOnly);
+                    if (enteredNickname.length === 0 || lowercaseAndDigitsOnly.length < 5) {
+                        setNicknameError(minLengthNicknameErrorMessage);
+                    } else {
+                        setNicknameError("");
+                    }
+                }}
                 maxLength={10}
             />
             </div>
-            <div className="error-message">
+            <div className={
+                nicknameError === minLengthNicknameErrorMessage
+                    ? "info-message"
+                    : "error-message"
+            }>
             {nicknameError && <span>{nicknameError}</span>}
             </div>
 
-            <div className="input-container-chooser">
-                <p>In which district of Vienna do you live?</p>
+            <div className="input-container-chooser district-container">
+                In which district of Vienna do you live?
                 <label htmlFor="district" className="input-label">&nbsp;</label>
                 <select
                     id="district"
@@ -78,17 +94,21 @@ const NewUserForm = ({setActiveModal}) => {
                 </select>
             </div>
 
-            <p>You need to consent to your information being shared with other users.  Only your email, nickname, and the district where you live will be shared with other users.</p>
-
-            <div className="input-container-chooser">
+            <p>
+            <div className="information-text">
+            <p>You need to consent to your information being shared with other users.  Only your email, nickname, and the district where you live will be shared.</p>
+            </div>
+            </p>
+            <div className="checkbox-wrapper">
                 <input
                     type="checkbox"
                     id="consent"
+                    className="consent-checkbox"
                     checked={hasConsented}
                     onChange={(e) => setHasConsented(e.target.checked)}
                     required
                 />
-                <label htmlFor="consent">&nbsp; I consent to the above information being shared with other users solely  for the purpose of sharing books.</label>
+                <label htmlFor="consent" className="consent-label"> <span>I consent to the above information being provided to other users (solely for the purpose of sharing books).</span></label>
             </div>
 
 

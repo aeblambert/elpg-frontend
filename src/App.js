@@ -44,10 +44,10 @@ function App() {
 
     // Timeout for session expiry
     useEffect(() => {
-        const sessionDurationInMinutes = 2;
+        const sessionDurationInMinutes = 10;
         SessionManager.setSessionTimeout(sessionDurationInMinutes);
         let lastReset = new Date().getTime();
-        const resetThresholdInMinutes = 1;
+        const resetThresholdInMinutes = 3;
         function resetSession() {
             const currentTime = new Date().getTime();
             if (SessionManager.checkSessionExists()) {
